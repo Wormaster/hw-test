@@ -18,7 +18,7 @@ func TestUnpack(t *testing.T) {
 		{input: "aaa0b", expected: "aab"},
 		{input: "🙃0", expected: ""},
 		{input: "aaф0b", expected: "aab"},
-		//Few additional tests with Unicode and russian letters
+		// Few additional tests with Unicode and russian letters
 		{input: "d\n5abc", expected: "d\n\n\n\n\nabc"},
 		{input: "asdg5в3vsdf3", expected: "asdgggggвввvsdfff"},
 		{input: "Й1а смайлик 1😃5?0!1", expected: "Йа смайлик 😃😃😃😃😃!"},
@@ -30,7 +30,6 @@ func TestUnpack(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.input, func(t *testing.T) {
 			result, err := Unpack(tc.input)
 			require.NoError(t, err)
@@ -42,7 +41,6 @@ func TestUnpack(t *testing.T) {
 func TestUnpackInvalidString(t *testing.T) {
 	invalidStrings := []string{"3abc", "45", "aaa10b", `qw\ne`}
 	for _, tc := range invalidStrings {
-		tc := tc
 		t.Run(tc, func(t *testing.T) {
 			_, err := Unpack(tc)
 			require.Truef(t, errors.Is(err, ErrInvalidString), "actual error %q", err)

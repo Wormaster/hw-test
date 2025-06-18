@@ -2,7 +2,6 @@ package hw02unpackstring
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"unicode"
 )
@@ -10,8 +9,6 @@ import (
 var ErrInvalidString = errors.New("invalid string")
 
 func Unpack(tc string) (string, error) {
-	// Place your code here.
-
 	runes := []rune(tc)
 	var builder strings.Builder
 	var escape bool
@@ -40,14 +37,14 @@ func Unpack(tc string) (string, error) {
 		case unicode.IsDigit(r):
 			{
 				if i == 0 {
-					//все пропало
+					// все пропало
 					return "", ErrInvalidString
 				}
 				if printPrev || !unicode.IsDigit(runes[i-1]) {
 					builder.WriteString(strings.Repeat(string(prev), int(r-'0')))
 					printPrev = false
 				} else {
-					//до этого тоже была цифра но неэкранированная
+					// до этого тоже была цифра, но неэкранированная
 					return "", ErrInvalidString
 				}
 			}
@@ -60,9 +57,6 @@ func Unpack(tc string) (string, error) {
 				builder.WriteString(string(r))
 			}
 		}
-
 	}
-
-	fmt.Println(builder.String())
 	return builder.String(), nil
 }
