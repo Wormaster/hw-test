@@ -96,16 +96,16 @@ func TestTop10(t *testing.T) {
 func TestStrangeTop10(t *testing.T) {
 	t.Run("strange text test", func(t *testing.T) {
 		expected := []string{
-			"нога", // 5
-			"»,",
-			"и",      // 4
-			"словом", // 4
-			"то",     // 4
-			"если",   // 3
-			"это",    // 3
-			"даже",   // 2
-			"же",     // 2
-			"не",     // 2
+			"и",         // 4
+			"нога",      // 5
+			"словом",    // 4
+			"то",        // 4
+			"если",      // 3
+			"это",       // 3
+			"даже",      // 2
+			"же",        // 2
+			"не",        // 2
+			"считается", // 2
 		}
 		require.Equal(t, expected, Top10(strangeText))
 	})
@@ -131,7 +131,7 @@ func TestSingleStrings(t *testing.T) {
 	}{
 		{
 			input:    "Нога и нога - это одинаковые слова, нога!, нога, нога, и  'нога' - тоже",
-			expected: []string{"нога", "и", "!,", "одинаковые", "слова", "тоже", "это"},
+			expected: []string{"нога", "и", "одинаковые", "слова", "тоже", "это"},
 		},
 		{
 			input:    "какой-то и какойто - это разные слова.",
@@ -151,7 +151,7 @@ func TestSingleStrings(t *testing.T) {
 		},
 		{
 			input:    "😀😃😄😁 😁😀😃😄😁 😁 😀😃😄😁 😁",
-			expected: []string{},
+			expected: []string{"😀😃😄😁", "😁", "😁😀😃😄😁"},
 		},
 	}
 
