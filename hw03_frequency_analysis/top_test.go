@@ -53,6 +53,8 @@ var strangeText = "Если вы встретите слово «Нога», т�
 	"например, «-------» — и да, по правилам это считается словом, " +
 	"в то время как одиночный символ «-» словом не является. - - - - - -"
 
+var chineseText = "今天是一个阳光明媚的日子, 我和我的朋友一起去公园散步. 公园里有许多花和树，空气清新, 人们都很高兴。我们聊了很多事情, 度过了一个愉快的下午。\n"
+
 func TestTop10(t *testing.T) {
 	t.Run("no words in empty string", func(t *testing.T) {
 		require.Len(t, Top10(""), 0)
@@ -94,18 +96,31 @@ func TestTop10(t *testing.T) {
 func TestStrangeTop10(t *testing.T) {
 	t.Run("strange text test", func(t *testing.T) {
 		expected := []string{
-			"нога",      // 5
-			"и",         // 4
-			"словом",    // 4
-			"то",        // 4
-			"если",      // 3
-			"это",       // 3
-			"даже",      // 2
-			"же",        // 2
-			"не",        // 2
-			"считается", // 2
+			"нога", // 5
+			"»,",
+			"и",      // 4
+			"словом", // 4
+			"то",     // 4
+			"если",   // 3
+			"это",    // 3
+			"даже",   // 2
+			"же",     // 2
+			"не",     // 2
 		}
 		require.Equal(t, expected, Top10(strangeText))
+	})
+}
+
+func TestChineseTop10(t *testing.T) {
+	t.Run("chinese text test", func(t *testing.T) {
+		expected := []string{
+			"人们都很高兴。我们聊了很多事情",
+			"今天是一个阳光明媚的日子",
+			"公园里有许多花和树，空气清新",
+			"度过了一个愉快的下午",
+			"我和我的朋友一起去公园散步",
+		}
+		require.Equal(t, expected, Top10(chineseText))
 	})
 }
 
@@ -116,7 +131,7 @@ func TestSingleStrings(t *testing.T) {
 	}{
 		{
 			input:    "Нога и нога - это одинаковые слова, нога!, нога, нога, и  'нога' - тоже",
-			expected: []string{"нога", "и", "одинаковые", "слова", "тоже", "это"},
+			expected: []string{"нога", "и", "!,", "одинаковые", "слова", "тоже", "это"},
 		},
 		{
 			input:    "какой-то и какойто - это разные слова.",
@@ -133,6 +148,10 @@ func TestSingleStrings(t *testing.T) {
 		{
 			input:    "- - - - - словом не является",
 			expected: []string{"не", "словом", "является"},
+		},
+		{
+			input:    "😀😃😄😁 😁😀😃😄😁 😁 😀😃😄😁 😁",
+			expected: []string{},
 		},
 	}
 

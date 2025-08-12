@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var re = regexp.MustCompile(`([a-zA-Zа-яА-Я\-]+[-.,]{0,}[a-zA-Zа-яА-Я]{1,}|[a-zA-Zа-яА-Я]{1}|[\-]{2,})`)
+var re = regexp.MustCompile(`(?i)(\p{L}+(?:\p{P}+\p{L}+)*|[\p{P}]{2,})`)
 
 type WordCount struct {
 	Word  string
@@ -17,6 +17,8 @@ func Top10(rs string) []string {
 	if len(strings.TrimSpace(rs)) == 0 {
 		return []string{}
 	}
+
+	rs = strings.ReplaceAll(rs, "\n", " ")
 
 	words := re.FindAllString(rs, -1)
 
