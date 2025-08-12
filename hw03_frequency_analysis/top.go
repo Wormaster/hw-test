@@ -18,8 +18,6 @@ func Top10(rs string) []string {
 		return []string{}
 	}
 
-	rs = strings.ReplaceAll(rs, "\n", " ")
-
 	words := re.FindAllString(rs, -1)
 
 	wc := countWords(words)
