@@ -10,6 +10,8 @@ import (
 )
 
 func TestCache(t *testing.T) {
+	numKeys := []Key{"one", "two", "three", "four", "five", "six", "seven"}
+
 	t.Run("empty cache", func(t *testing.T) {
 		c := NewCache(10)
 
@@ -50,13 +52,74 @@ func TestCache(t *testing.T) {
 	})
 
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		c := NewCache(5)
+
+		for i, key := range numKeys {
+			c.Set(key, i)
+		}
+
+		// первых двух быть не должно
+		val, ok := c.Get(numKeys[0])
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = c.Get(numKeys[1])
+		require.False(t, ok)
+		require.Nil(t, val)
+	})
+
+	t.Run("overflow logic", func(t *testing.T) {
+		c := NewCache(5)
+
+		nextKeys := []Key{"six", "seven"}
+		for i, key := range numKeys {
+			c.Set(key, i)
+		}
+
+		// Должно быть - 5,4,3,2,1
+		// поднимем 2 элемента
+		val, ok := c.Get(numKeys[4])
+		require.True(t, ok)
+		require.Equal(t, 4, val)
+
+		wasInCache := c.Set(numKeys[3], 500)
+		require.True(t, wasInCache)
+		// Должно стать 4,5,3,2,1
+
+		// Добавим еще парочку
+		for i, key := range nextKeys {
+			c.Set(key, i)
+		}
+
+		// один и два должны покинуть чат
+		val, ok = c.Get(numKeys[0])
+		require.False(t, ok)
+		require.Equal(t, nil, val)
+
+		val, ok = c.Get(numKeys[1])
+		require.False(t, ok)
+		require.Equal(t, nil, val)
+	})
+
+	t.Run("clear logic", func(t *testing.T) {
+		c := NewCache(5)
+
+		for i, key := range numKeys {
+			c.Set(key, i)
+		}
+
+		c.Clear()
+
+		// Ничего из добавленного нет
+		for _, key := range numKeys {
+			val, ok := c.Get(key)
+			require.False(t, ok)
+			require.Equal(t, nil, val)
+		}
 	})
 }
 
 func TestCacheMultithreading(t *testing.T) {
-	t.Skip() // Remove me if task with asterisk completed.
-
 	c := NewCache(10)
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
