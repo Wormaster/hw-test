@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -124,19 +125,41 @@ func TestCacheMultithreading(t *testing.T) {
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
 
+	var sets, gets, hits, misses int64
+
 	go func() {
 		defer wg.Done()
 		for i := 0; i < 1_000_000; i++ {
 			c.Set(Key(strconv.Itoa(i)), i)
+			atomic.AddInt64(&sets, 1)
 		}
 	}()
 
 	go func() {
 		defer wg.Done()
 		for i := 0; i < 1_000_000; i++ {
-			c.Get(Key(strconv.Itoa(rand.Intn(1_000_000))))
+			if _, ok := c.Get(Key(strconv.Itoa(rand.Intn(1_000_000)))); ok {
+				atomic.AddInt64(&hits, 1)
+			} else {
+				atomic.AddInt64(&misses, 1)
+			}
+			atomic.AddInt64(&gets, 1)
 		}
 	}()
 
 	wg.Wait()
+
+	t.Logf("done: sets=%d, gets=%d (hits=%d, misses=%d)",
+		atomic.LoadInt64(&sets),
+		atomic.LoadInt64(&gets),
+		atomic.LoadInt64(&hits),
+		atomic.LoadInt64(&misses),
+	)
+
+	if atomic.LoadInt64(&hits)+atomic.LoadInt64(&misses) != atomic.LoadInt64(&gets) {
+		t.Fatalf("inconsistent read counters: hits+misses=%d, gets=%d",
+			atomic.LoadInt64(&hits)+atomic.LoadInt64(&misses),
+			atomic.LoadInt64(&gets),
+		)
+	}
 }
